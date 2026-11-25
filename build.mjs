@@ -1,7 +1,8 @@
 // Builds single-file versions of index.html that need no network at all. Run: node build.mjs
 //   dist/offline-office.html  one file to download, share or open from a USB stick
 //   dist/artifact.html        the same page without <html>/<head>, for the claude.ai artifact viewer
-// Every library, font and asset is embedded, and the file's security policy blocks all network access.
+// Every library, font and asset is embedded. The security policy allows network access only for the
+// opt-in AI: a model server on this computer, or an HTTPS service the user set up.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 
@@ -22,6 +23,7 @@ const lazy = [
     'vendor/pako.min.js',
     'vendor/UTIF.js',
     'vendor/fontkit.umd.min.js',
+    'vendor/anthropic-sdk.min.js',
     'vendor/tesseract.min.js',
     'vendor/tesseract-worker.min.js',
     'vendor/tesseract-core-simd-lstm.wasm.js',
@@ -78,7 +80,7 @@ html = html.replace(
 // No 'self': a file opened from disk or as an artifact has no site of its own to load from.
 html = html.replace(
   /<meta http-equiv="Content-Security-Policy" content="[^"]*">/,
-  `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; connect-src data: blob:; frame-src blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">`,
+  `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; style-src 'unsafe-inline'; font-src data:; img-src data: blob:; connect-src data: blob: http://localhost:* http://127.0.0.1:* http://[::1]:* https:; frame-src blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">`,
 );
 if (/<(script|link)[^>]+(src|href)="(?!data:|blob:)/.test(html))
   throw new Error('a file reference was not embedded');

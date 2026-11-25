@@ -1,4 +1,50 @@
-# Offline Office
+# Offline Office AI
+
+This is [Offline Office](https://github.com/sh1lll/offline-office) with an optional AI assistant
+added. If you want the version that never touches the network, use that one. This one is the same
+app, plus a way to hook up a model you choose: one running on your own computer (Ollama, LM Studio)
+or an online service (Claude, OpenAI, Gemini, OpenRouter or any compatible gateway).
+
+AI is off until you set it up, and the setup makes you read and tick a warning before any online
+service can be used. I kept it out of the main build on purpose. It adds code and network access
+the main app doesn't need, and an "offline" app that quietly talks to an AI company would be lying.
+
+![AI setup, step 1](docs/screenshots/ai-setup.png)
+
+## How the AI works
+
+- **Off by default.** No AI buttons show anywhere until you finish "Set up AI" in the header.
+- **Local first.** Ollama and LM Studio run the model on your own machine, so text you send stays
+  on your device.
+- **Online needs a tick.** Pick Claude, OpenAI, Gemini, OpenRouter or another online service and
+  you get a plain list of what that means: your text goes to that company's servers, they handle
+  it under their own policy, it may cost money, and your API key is saved in this browser. The
+  Continue button stays locked until you tick "I understand".
+- **It tests before it turns on.** The last step sends one short test message so you know it works
+  before anything real is sent.
+- **It asks before each online request.** You see how many characters are going and to which
+  address, and you can cancel. You can turn the question off until you close the tab.
+- **One click off.** The AI button in the header shows whether it's local or online. "Turn AI off"
+  deletes the saved key.
+
+![The warning before an online service can be used](docs/screenshots/ai-risk.png)
+
+What it can do right now:
+
+- **Documents:** rewrite the selected text (fix spelling, shorten, make clearer or more formal),
+  or summarize the document, suggest a title and list action items.
+- **Text:** edit or explain a selection or the whole file.
+- **Sheets:** describe what you want and get a formula in the formula bar.
+- **PDF:** ask questions about the PDF; answers name the pages they came from.
+
+![Rewriting selected text with a local model](docs/screenshots/ai-panel.png)
+
+**Local model setup.** Local servers only answer pages they trust. For Ollama, start it with
+`OLLAMA_ORIGINS="*" ollama serve`. For LM Studio, open the Developer tab and turn on "Enable CORS".
+
+## Everything else
+
+The rest of this page is the same as Offline Office.
 
 ![Offline Office home screen](docs/screenshots/home.png)
 
@@ -69,8 +115,8 @@ desktop or a USB stick.
 
 ## Get it
 
-- **One file:** download `offline-office.html` from the [Releases](../../releases) page and open it
-  in any recent browser. It's about 10 MB.
+- **One file:** download `offline-office-ai.html` from the [Releases](../../releases) page and open
+  it in any recent browser. It's about 10 MB.
 - **Hosted:** serve this folder with any static file server, or turn on GitHub Pages for the
   repository root. There's no build step for that.
 
@@ -158,9 +204,13 @@ editable document.
 
 ## Privacy and security
 
-- Files never leave the tab. The Content Security Policy only lets the page load its own files
-  (index.html) or nothing at all (the single-file build), so a document cannot load tracking
-  images or call home, and no third party sees that you opened the app.
+- Files never leave the tab unless you send text to an AI service you set up. The Content Security
+  Policy lets the page load only its own files, and allows network requests only to a model server
+  on this computer or to HTTPS addresses, which the opt-in AI needs. Opened documents are
+  sanitized and never run scripts, so they can't use that access. If you want no network access at
+  all, use [Offline Office](https://github.com/sh1lll/offline-office).
+- Your API key is stored in this browser's local storage and sent only to the service you chose.
+  Claude requests go through the official Anthropic SDK (`vendor/anthropic-sdk.min.js`).
 - Libraries are copied into `vendor/` from pinned versions and checked against SHA-384 hashes
   by `vendor.mjs`. Fonts are copied from Google Fonts the same way, Latin and Latin Extended only
   (other scripts use the system font).
@@ -189,6 +239,7 @@ src/photos.js       Photo editor
 src/compare.js      Compare screen
 src/convert.js      batch converter
 src/addons.js       your files: fonts, images, templates, OCR languages (IndexedDB)
+src/ai.js           opt-in AI: setup steps, providers, the AI panel in each editor
 src/boot.js         start-up checks
 vendor/             libraries and interface fonts (committed, from vendor.mjs)
 assets/             Noto Sans fonts for PDF text
@@ -224,6 +275,7 @@ Without Chrome those tests are skipped.
 | [html2canvas](https://github.com/niklasvh/html2canvas) | Slide images | MIT |
 | [tesseract.js](https://github.com/naptha/tesseract.js) and [Tesseract](https://github.com/tesseract-ocr/tesseract) | Text recognition | Apache-2.0 |
 | [tessdata_fast](https://github.com/tesseract-ocr/tessdata_fast) English model | Text recognition | Apache-2.0 |
+| [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) | Talking to Claude (AI edition only) | MIT |
 | [heic2any](https://github.com/alexcorvi/heic2any) | HEIC photos (bundles libheif, LGPL-3.0) | MIT |
 | [UTIF.js](https://github.com/photopea/UTIF.js) | TIFF photos | MIT |
 | [pako](https://github.com/nodeca/pako) | TIFF decompression | MIT and Zlib |

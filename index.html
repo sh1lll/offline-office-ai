@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<!-- Everything loads from this site; no other host is allowed, so opened files cannot reach the network.
+<!-- Everything loads from this site. connect-src also allows a local model server and HTTPS services,
+     used only by the opt-in AI (src/ai.js); imported files are sanitized and never run scripts.
      'unsafe-eval' is for the formula engine (src/formula.js). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: blob: http://localhost:* http://127.0.0.1:* http://[::1]:* https:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Offline Office</title>
 <link rel="stylesheet" href="vendor/fonts.css">
 <link rel="stylesheet" href="src/styles.css">
@@ -26,6 +27,7 @@
     <button class="tab" role="tab" data-mod="convert">Convert</button>
   </nav>
   <div class="top-actions">
+    <button class="btn ai-head" id="aiBtn" data-i="ai"><span>Set up AI</span></button>
     <button class="btn" id="openAny" title="Open a file (Ctrl O)" aria-label="Open a file" data-i="folder"><span class="lbl-wide">Open</span></button>
     <button class="btn sq ghost" id="themeBtn" title="Theme: system" aria-label="Change theme"></button>
   </div>
@@ -91,7 +93,7 @@
     <button class="btn sq ghost" data-c="removeFormat" title="Clear formatting" aria-label="Clear formatting" data-i="clearFmt"></button>
     <span class="sep"></span>
     <button class="btn sq ghost" data-a="find" title="Find and replace (Ctrl F)" aria-label="Find and replace" data-i="search"></button>
-    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button>
+    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button><button class="btn ghost ai-tool" data-ai="doc" data-i="ai" hidden title="Ask AI">AI</button>
   </div>
   <div class="work">
     <div class="desk doc-desk" id="docDesk"><div class="doc-page" id="docPage" contenteditable="true" spellcheck="true"></div></div>
@@ -135,7 +137,7 @@
     </div></details>
     <span class="sep"></span>
     <button class="btn sq ghost" data-a="zoomOut" title="Zoom out" data-i="minus"></button><span class="status" id="pdfZoom" style="padding:0">100%</span><button class="btn sq ghost" data-a="zoomIn" title="Zoom in" data-i="plus"></button><button class="btn ghost" data-a="fit" title="Fit page width">Fit</button>
-    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button><button class="btn primary" data-a="export">Save PDF</button>
+    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button><button class="btn ghost ai-tool" data-ai="pdf" data-i="ai" hidden title="Ask AI">AI</button><button class="btn primary" data-a="export">Save PDF</button>
   </div>
   <div class="work">
     <div class="panel thumbs" id="pdfThumbs"></div>
@@ -204,7 +206,7 @@
     </div></details>
     <details class="menu"><summary class="btn ghost">Functions<span class="ic" data-i="chev"></span></summary><div class="menu-list" id="shFns"></div></details>
     <button class="btn ghost" data-a="chart">Chart</button>
-    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button>
+    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button><button class="btn ghost ai-tool" data-ai="sheet" data-i="ai" hidden title="Ask AI">AI</button>
   </div>
   <div class="fbar"><input class="ctl ref" id="shRef" value="A1" aria-label="Cell reference"><span class="fx">fx</span><input class="f" id="shFormula" aria-label="Formula" placeholder="Value or =formula"></div>
   <div class="grid-wrap" id="shWrap" tabindex="0"><table class="grid" id="shGrid"></table></div>
@@ -233,7 +235,7 @@
     <button class="btn ghost" id="txWrap" aria-pressed="false" title="Word wrap">Wrap</button>
     <button class="btn sq ghost" data-a="smaller" title="Smaller text">A−</button><button class="btn sq ghost" data-a="bigger" title="Larger text">A+</button>
     <span class="status" id="txName" style="padding:0 6px"></span>
-    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button>
+    <button class="btn ghost push" data-a="example" title="Replace what is open with an example file">Example</button><button class="btn ghost ai-tool" data-ai="text" data-i="ai" hidden title="Ask AI">AI</button>
   </div>
   <div class="work" id="txWork">
     <div class="findbar" id="txFind" hidden style="position:absolute;top:6px;right:6px;z-index:10;box-shadow:var(--shadow)">
@@ -369,6 +371,7 @@
 <script src="src/compare.js"></script>
 <script src="src/convert.js"></script>
 <script src="src/addons.js"></script>
+<script src="src/ai.js"></script>
 <script src="src/boot.js"></script>
 </body>
 </html>

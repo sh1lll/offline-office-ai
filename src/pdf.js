@@ -1934,6 +1934,7 @@ Mods.pdf = (() => {
     open,
     act,
     append,
+    text: extractText,
     hasDoc: () => pages.length > 0,
     save: () => exportPdf(),
     async onShow() {

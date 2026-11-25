@@ -106,6 +106,10 @@ export const LIBS = [
     'uqITnPoYBbyaWUqYeiiQSy6HolADUMqvhbmwtoB2frlB0ViQLTtIqO8ap1zgmmLT',
   ],
 ];
+// vendor/anthropic-sdk.min.js is the official Anthropic SDK (@anthropic-ai/sdk 1.14.0) bundled for the
+// browser, used only by the opt-in AI. To rebuild it: npm install @anthropic-ai/sdk@1.14.0 esbuild, then
+// bundle `import Anthropic from '@anthropic-ai/sdk'; window.Anthropic = Anthropic;` with
+// esbuild --bundle --minify --format=iife --platform=browser --target=es2020 --legal-comments=eof.
 // Interface fonts and photo-text fonts. Only Latin and Latin Extended are kept; other scripts fall back
 // to the system font.
 const FONTS_CSS =
